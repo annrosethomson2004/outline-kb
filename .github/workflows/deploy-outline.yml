@@ -1,27 +1,28 @@
-name: Deploy Outline (Swarm)
+name: Deploy Outline KB
 
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: self-hosted
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create env file
-        run: |
-          cat > .env <<EOF
-          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-          OUTLINE_URL=${{ secrets.OUTLINE_URL }}
-          OUTLINE_SECRET_KEY=${{ secrets.OUTLINE_SECRET_KEY }}
-          OUTLINE_UTILS_SECRET=${{ secrets.OUTLINE_UTILS_SECRET }}
-          EOF
+      - name: Verify Docker
+        run: docker --version
 
-      - name: Deploy stack
+      - name: Verify Docker Compose
+        run: docker compose version || docker-compose --version
+
+      - name: Deploy Outline using Docker Compose
         run: |
-          export $(cat .env | xargs)
-          ./deploy.sh
+          docker compose down || true
+          docker compose up -d
+
+      - name: Check running containers
+        run: docker ps
