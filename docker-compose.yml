@@ -19,7 +19,7 @@ services:
       - postgres
       - redis
     ports:
-      - "3000:3000"
+      - "3005:3000"
     environment:
       DATABASE_URL: postgres://outline:outline@postgres:5432/outline
       REDIS_URL: redis://redis:6379
