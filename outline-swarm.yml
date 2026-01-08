@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: outline
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: outline
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks: [outline_net]
+    deploy:
+      replicas: 1
+
+  redis:
+    image: redis:7-alpine
+    networks: [outline_net]
+    deploy:
+      replicas: 1
+
+  outline:
+    image: outlinewiki/outline:latest
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      # Required
+      DATABASE_URL: postgres://outline:${POSTGRES_PASSWORD}@postgres:5432/outline
+      REDIS_URL: redis://redis:6379
+      URL: ${OUTLINE_URL}
+
+      # Secrets (must be long random strings)
+      SECRET_KEY: ${OUTLINE_SECRET_KEY}
+      UTILS_SECRET: ${OUTLINE_UTILS_SECRET}
+
+      # Local file storage (simple for demo)
+      FILE_STORAGE: local
+      FILE_STORAGE_LOCAL_ROOT_DIR: /var/lib/outline/data
+
+      # Recommended
+      PORT: 3000
+
+      # If your teacher doesn't need email login, you can still run.
+      # But Outline usually needs auth config (Google/OIDC/email).
+      # We'll handle login setup in step 6.
+    volumes:
+      - outline_data:/var/lib/outline/data
+    ports:
+      - "3005:3000"
+    networks: [outline_net]
+    deploy:
+      replicas: 1
+
+networks:
+  outline_net:
+    driver: overlay
+
+volumes:
+  pg_data:
+  outline_data:

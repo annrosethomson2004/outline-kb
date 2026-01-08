@@ -1,0 +1,27 @@
+name: Deploy Outline (Swarm)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create env file
+        run: |
+          cat > .env <<EOF
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          OUTLINE_URL=${{ secrets.OUTLINE_URL }}
+          OUTLINE_SECRET_KEY=${{ secrets.OUTLINE_SECRET_KEY }}
+          OUTLINE_UTILS_SECRET=${{ secrets.OUTLINE_UTILS_SECRET }}
+          EOF
+
+      - name: Deploy stack
+        run: |
+          export $(cat .env | xargs)
+          ./deploy.sh
