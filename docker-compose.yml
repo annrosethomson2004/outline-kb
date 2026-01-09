@@ -23,8 +23,11 @@ services:
     environment:
       DATABASE_URL: postgres://outline:outline@postgres:5432/outline
       REDIS_URL: redis://redis:6379
+      URL: http://localhost:3005
+      COLLABRATION_URL: http://localhost:3005
       SECRET_KEY: ceca45be33647e7bc39547995759ed2fd3de6c3953af77039a5354102678e5d8
-      UTILS_SECRET: your-utils-secret
+      UTILS_SECRET: db630ed652633d93d65ed0345106704ee42a4fc64d4cb4fdf10231bf5c414951
+      PGSSLMODE: disable
     restart: always
 
 volumes:
